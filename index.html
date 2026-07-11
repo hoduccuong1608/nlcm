@@ -364,6 +364,7 @@
     <div class="quiz-top">
       <span class="counter" id="quizCounter">Câu 1/20</span>
       <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <button class="pill" id="autoAdvanceToggle" style="font-size:11.5px;padding:5px 12px;white-space:nowrap;">⚡ Tự động chuyển câu: Tắt</button>
       <span class="score-mini" id="scoreMini">Đúng 0</span>
     </div>
     <div class="q-panel">
@@ -373,7 +374,10 @@
       <div id="feedbackWrap"></div>
     </div>
     <div class="quiz-actions">
-      <button class="btn btn-ghost" id="btnQuit">Thoát</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" id="btnQuit">Thoát</button>
+        <button class="btn btn-ghost" id="btnPrev">← Câu trước</button>
+      </div>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-primary" id="btnCheck">Kiểm tra đáp án</button>
         <button class="btn btn-primary hidden" id="btnNext">Câu tiếp theo →</button>
@@ -646,6 +650,10 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     document.getElementById('btnStart').disabled = noSel;
   }
 
+  let answersState = []; // per-question: null | {selected}
+  let autoAdvance = false;
+  let autoAdvanceTimer = null;
+
   function startQuiz(customPool){
     let base;
     if(customPool){
@@ -658,6 +666,7 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     }
     pool = base;
     idx = 0; score = 0; wrongLog = [];
+    answersState = new Array(pool.length).fill(null);
     show('screen-quiz');
     renderQuestion();
   }
@@ -826,6 +835,7 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   }
 
   function renderQuestion(){
+    if(autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
     answered = false; selectedOpt = null;
     const q = pool[idx];
     document.getElementById('qCatTag').textContent = q.category;
@@ -833,6 +843,7 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     document.getElementById('quizCounter').textContent = `Câu ${idx+1}/${pool.length}`;
     document.getElementById('scoreMini').textContent = `Đúng ${score}`;
     document.getElementById('progressBar').style.width = `${Math.round((idx/pool.length)*100)}%`;
+    document.getElementById('btnPrev').disabled = (idx===0);
 
     const optsWrap = document.getElementById('optsWrap');
     optsWrap.innerHTML = '';
@@ -853,21 +864,25 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     document.getElementById('feedbackWrap').innerHTML = '';
     document.getElementById('btnCheck').classList.remove('hidden');
     document.getElementById('btnNext').classList.add('hidden');
+
+    const stored = answersState[idx];
+    if(stored){
+      selectedOpt = stored.selected;
+      answered = true;
+      [...optsWrap.children].forEach(c=>{ if(c.dataset.letter===stored.selected) c.classList.add('selected'); });
+      applyAnswerDisplay(stored.selected, false);
+    }
   }
 
-  function checkAnswer(){
-    if(!selectedOpt) return;
-    answered = true;
+  function applyAnswerDisplay(selected, triggerAutoAdvance){
     const q = pool[idx];
     const correct = q.answer;
-    const isCorrect = selectedOpt === correct;
-    if(isCorrect) score++;
-    else wrongLog.push({...q, chosen:selectedOpt});
+    const isCorrect = selected === correct;
 
     [...document.getElementById('optsWrap').children].forEach(c=>{
       c.classList.add('disabled');
       if(c.dataset.letter === correct) c.classList.add('correct');
-      else if(c.dataset.letter === selectedOpt) c.classList.add('wrong');
+      else if(c.dataset.letter === selected) c.classList.add('wrong');
     });
 
     const fb = document.getElementById('feedbackWrap');
@@ -882,17 +897,43 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
         ${refHtml}
       </div>
     `;
-    document.getElementById('scoreMini').textContent = `Đúng ${score}`;
     document.getElementById('btnCheck').classList.add('hidden');
     document.getElementById('btnNext').classList.remove('hidden');
+
+    if(triggerAutoAdvance && autoAdvance){
+      autoAdvanceTimer = setTimeout(()=>{ autoAdvanceTimer = null; nextQuestion(); }, 1400);
+    }
+  }
+
+  function checkAnswer(){
+    if(!selectedOpt) return;
+    answered = true;
+    const q = pool[idx];
+    const correct = q.answer;
+    const isCorrect = selectedOpt === correct;
+    if(isCorrect) score++;
+    else wrongLog.push({...q, chosen:selectedOpt});
+    answersState[idx] = { selected: selectedOpt };
+
+    applyAnswerDisplay(selectedOpt, true);
+    document.getElementById('scoreMini').textContent = `Đúng ${score}`;
   }
 
   function nextQuestion(){
+    if(autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
     if(idx < pool.length-1){
       idx++;
       renderQuestion();
     } else {
       finishQuiz();
+    }
+  }
+
+  function backQuestion(){
+    if(autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+    if(idx > 0){
+      idx--;
+      renderQuestion();
     }
   }
 
@@ -1019,7 +1060,17 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   document.getElementById('btnStart').addEventListener('click', ()=> startQuiz());
   document.getElementById('btnCheck').addEventListener('click', checkAnswer);
   document.getElementById('btnNext').addEventListener('click', nextQuestion);
-  document.getElementById('btnQuit').addEventListener('click', ()=> show('screen-home'));
+  document.getElementById('btnPrev').addEventListener('click', backQuestion);
+  document.getElementById('autoAdvanceToggle').addEventListener('click', (e)=>{
+    autoAdvance = !autoAdvance;
+    e.target.classList.toggle('active', autoAdvance);
+    e.target.textContent = `⚡ Tự động chuyển câu: ${autoAdvance? 'Bật':'Tắt'}`;
+    if(!autoAdvance && autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  });
+  document.getElementById('btnQuit').addEventListener('click', ()=>{
+    if(autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+    show('screen-home');
+  });
   document.getElementById('btnRetryAll').addEventListener('click', ()=> show('screen-home'));
   document.getElementById('btnRetryWrongOnly').addEventListener('click', ()=>{
     if(lastWrongOnlyPool && lastWrongOnlyPool.length) startQuiz(shuffle(lastWrongOnlyPool));
