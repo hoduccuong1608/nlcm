@@ -11,8 +11,9 @@
   :root{
     --navy:#132A3E;
     --navy-deep:#0C1D2C;
-    --paper:#FAF6EC;
+    --paper:#FFFFFF;
     --paper-dim:#F1EBDB;
+    --page-bg:#E9F1FB;
     --ink:#1E2A33;
     --ink-soft:#4A5A63;
     --gold:#B9922F;
@@ -21,47 +22,71 @@
     --seal-soft:#F3DAD3;
     --forest:#2E6B5B;
     --forest-soft:#D8ECE4;
-    --line:#D9D0B8;
+    --exam-blue:#2F6FAE;
+    --exam-blue-soft:#DCEAF7;
+    --line:#DCE3EC;
     --radius:4px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--navy-deep);
-    background-image:
-      radial-gradient(circle at 15% 8%, rgba(185,146,47,0.10), transparent 40%),
-      radial-gradient(circle at 85% 90%, rgba(46,107,91,0.12), transparent 45%);
+    background:var(--page-bg);
     color:var(--ink);
     font-family:'Be Vietnam Pro', sans-serif;
     min-height:100vh;
   }
-  .app{max-width:920px;margin:0 auto;padding:28px 18px 80px;}
-  .masthead{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:14px 4px 22px;
-    border-bottom:1px solid rgba(228,206,143,0.25);
-    margin-bottom:26px;
+
+  .shell{display:flex;min-height:100vh;align-items:stretch;}
+  .sidebar{
+    width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);
+    padding:20px 18px;display:flex;flex-direction:column;gap:18px;
+    position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;
   }
-  .masthead .brand{
-    display:flex;align-items:center;gap:12px;
+  .sidebar-top{display:none;}
+  .avatar-circle{
+    width:60px;height:60px;border-radius:50%;background:var(--forest-soft);
+    display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;
+    border:2px solid var(--forest);
   }
-  .brand-mark{
-    width:38px;height:38px;border-radius:50%;
-    border:1.5px solid var(--gold-soft);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Source Serif 4',serif;font-weight:700;color:var(--gold-soft);
-    font-size:15px;letter-spacing:0.5px;
+  .sidebar-profile{text-align:center;}
+  .sidebar-name{font-weight:700;color:var(--navy);margin-top:8px;font-size:13.5px;font-family:'Source Serif 4',serif;}
+  .sidebar-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .sidebar-info{font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;}
+  .info-row{display:flex;justify-content:space-between;padding:4px 0;}
+  .info-row b{color:var(--navy);font-family:'JetBrains Mono',monospace;}
+  .sidebar-btn-home{
+    width:100%;background:var(--forest);color:#fff;border:none;padding:11px;border-radius:4px;
+    font-weight:600;cursor:pointer;font-size:13px;font-family:'Be Vietnam Pro',sans-serif;
   }
-  .brand-text{color:var(--paper);}
-  .brand-text .t1{font-family:'Source Serif 4',serif;font-size:15px;font-weight:600;letter-spacing:0.4px;}
-  .brand-text .t2{font-size:11px;color:var(--gold-soft);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
-  .masthead .meta{color:rgba(250,246,236,0.55);font-size:12px;font-family:'JetBrains Mono',monospace;}
+  .sidebar-exam-box{display:none;flex-direction:column;gap:10px;}
+  .sidebar-exam-box.active{display:flex;}
+  .sidebar-btn-submit{
+    width:100%;background:var(--exam-blue);color:#fff;border:none;padding:11px;border-radius:4px;
+    font-weight:600;cursor:pointer;font-size:13px;font-family:'Be Vietnam Pro',sans-serif;
+  }
+  .sidebar-timer{
+    text-align:center;font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;
+    background:#1A1A1A;color:#ff5b4d;padding:9px;border-radius:4px;letter-spacing:1px;
+  }
+  .sidebar-timer.low{animation:examPulse 1s infinite;}
+
+  .main-col{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{
+    background:#fff;border-bottom:1px solid var(--line);padding:13px 26px;font-size:12px;
+    color:var(--ink-soft);display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  }
+  .topbar b{color:var(--navy);}
+  .topbar-sep{color:var(--line);}
+  .hamburger-btn{display:none;background:none;border:none;font-size:19px;color:var(--navy);cursor:pointer;padding:2px 6px;margin-right:2px;}
+  .sidebar-backdrop{display:none;}
+
+  .app{max-width:920px;margin:0 auto;padding:28px 18px 80px;width:100%;}
 
   .card{
     background:var(--paper);
     border:1px solid var(--line);
     border-radius:var(--radius);
-    box-shadow:0 18px 40px -20px rgba(0,0,0,0.55);
+    box-shadow:0 10px 28px -14px rgba(19,42,62,0.18);
   }
 
   /* ---------- HOME ---------- */
@@ -266,21 +291,16 @@
     padding:14px 18px;border-radius:var(--radius);font-size:13.5px;line-height:1.6;
   }
 
-  .exam-top-bar{
-    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
-    padding:16px 40px;border-bottom:1px solid var(--line);
-  }
-  .exam-timer{
-    font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--seal);
-    background:#1A1A1A;color:#ff5b4d;padding:6px 16px;border-radius:4px;letter-spacing:1px;
-  }
-  .exam-timer.low{animation:examPulse 1s infinite;}
   @keyframes examPulse{ 50%{ opacity:0.45; } }
 
-  .exam-nav-wrap{padding:18px 40px;border-bottom:1px solid var(--line);max-height:220px;overflow-y:auto;}
-  .exam-nav-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
-  .exam-nav-label{font-size:12px;color:var(--ink-soft);width:210px;flex-shrink:0;padding-top:5px;}
-  .exam-nav-circles{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
+  .exam-nav-wrap{padding:16px 20px;border-bottom:1px solid var(--line);max-height:220px;overflow-y:auto;}
+  .exam-nav-row{margin-bottom:12px;}
+  .exam-nav-row:last-child{margin-bottom:0;}
+  .exam-nav-label{
+    display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;
+    font-weight:600;letter-spacing:0.2px;
+  }
+  .exam-nav-circles{display:flex;flex-wrap:wrap;gap:6px;width:100%;}
   .exam-nav-circle{
     width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--navy);
     font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;flex-shrink:0;
@@ -306,26 +326,58 @@
 
   footer.foot{text-align:center;color:rgba(250,246,236,0.35);font-size:11.5px;margin-top:26px;font-family:'JetBrains Mono',monospace;}
 
+  @media (min-width:641px){
+    .exam-nav-wrap{padding-left:40px;padding-right:40px;}
+  }
   @media (max-width:640px){
     .hero,.panel,.q-panel,.quiz-top,.quiz-actions,.result-hero,.breakdown,.review-list,.result-actions{padding-left:20px;padding-right:20px;}
     .bd-name{width:140px;font-size:12px;}
+  }
+  @media (max-width:900px){
+    .hamburger-btn{display:inline-block;}
+    .sidebar{
+      position:fixed;left:0;top:0;height:100%;z-index:60;
+      transform:translateX(-100%);transition:transform .22s ease;
+      box-shadow:16px 0 40px rgba(12,29,44,0.25);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .sidebar-backdrop.open{
+      display:block;position:fixed;inset:0;background:rgba(12,29,44,0.35);z-index:55;
+    }
   }
   .hidden{display:none !important;}
 </style>
 </head>
 <body>
-<div class="app">
-
-  <div class="masthead">
-    <div class="brand">
-      <div class="brand-mark">BIDV</div>
-      <div class="brand-text">
-        <div class="t1">Ôn thi Năng lực chuyên môn</div>
-        <div class="t2">Kỳ kiểm tra NLCM cán bộ 2025</div>
-      </div>
+<div class="shell">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="appSidebar">
+    <div class="sidebar-profile">
+      <div class="avatar-circle">📘</div>
+      <div class="sidebar-name">Ôn tập cá nhân</div>
+      <div class="sidebar-sub">BIDV · NLCM 2025</div>
     </div>
-    <div class="meta" id="topMeta">Bộ câu hỏi tổng hợp</div>
-  </div>
+    <div class="sidebar-info">
+      <div class="info-row"><span>Ngân hàng câu hỏi</span><b>570</b></div>
+      <div class="info-row"><span>Đã ôn (lượt)</span><b id="sbHistCount">0</b></div>
+      <div class="info-row"><span>Điểm gần nhất</span><b id="sbLastScore">—</b></div>
+    </div>
+    <button class="sidebar-btn-home" id="sidebarHomeBtn">🏠 Trang chủ</button>
+    <div class="sidebar-exam-box" id="sidebarExamBox">
+      <div class="sidebar-timer" id="sidebarTimer">45:00</div>
+      <button class="sidebar-btn-submit" id="btnSubmitExamSidebar">✈ Nộp bài</button>
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <div class="topbar">
+      <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+      <span>ĐỢT THI: <b>KIỂM TRA NLCM CÁN BỘ 2025</b></span>
+      <span class="topbar-sep">|</span>
+      <span>BÀI THI: <b id="topbarSub">Bộ câu hỏi tổng hợp</b></span>
+    </div>
+
+<div class="app">
 
   <!-- ===================== HOME SCREEN ===================== -->
   <div id="screen-home" class="card">
@@ -437,11 +489,6 @@
 
   <!-- ===================== EXAM (REAL TEST) SCREEN ===================== -->
   <div id="screen-exam" class="card hidden">
-    <div class="exam-top-bar">
-      <span class="counter">ĐỢT THI: KIỂM TRA NLCM CÁN BỘ 2025</span>
-      <div class="exam-timer" id="examTimer">45:00</div>
-      <button class="btn btn-primary" id="btnSubmitExam" style="padding:9px 18px;font-size:13px;">✈ Nộp bài</button>
-    </div>
     <div class="exam-nav-wrap" id="examNavWrap"></div>
     <div class="q-panel">
       <div style="display:flex;justify-content:space-between;align-items:baseline;">
@@ -507,6 +554,8 @@
   </div>
 
   <footer class="foot">Công cụ ôn tập cá nhân · Dữ liệu chỉ lưu trong phiên làm việc này · 570 câu hỏi / 7 chuyên đề</footer>
+</div>
+  </div>
 </div>
 
 <script>
@@ -797,11 +846,34 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     renderQuestion();
   }
 
+  const TOPBAR_LABELS = {
+    'screen-home': 'Bộ câu hỏi tổng hợp',
+    'screen-quiz': 'Luyện tập tự chọn',
+    'screen-result': 'Kết quả',
+    'screen-study': 'Học bài',
+    'screen-exam-intro': 'Đề thi thật — 50 câu / 45 phút',
+    'screen-exam': 'Đề thi thật — 50 câu / 45 phút',
+  };
+
+  function updateSidebarStats(){
+    document.getElementById('sbHistCount').textContent = history.length;
+    document.getElementById('sbLastScore').textContent = history.length ? history[history.length-1].pct+'%' : '—';
+  }
+
   function show(id){
     ['screen-home','screen-quiz','screen-result','screen-study','screen-exam-intro','screen-exam'].forEach(s=>{
       document.getElementById(s).classList.toggle('hidden', s!==id);
     });
     if(id==='screen-home') renderProgressPanel();
+    document.getElementById('topbarSub').textContent = TOPBAR_LABELS[id] || 'Bộ câu hỏi tổng hợp';
+    document.getElementById('sidebarExamBox').classList.toggle('active', id==='screen-exam');
+    updateSidebarStats();
+    closeSidebarDrawer();
+  }
+
+  function closeSidebarDrawer(){
+    document.getElementById('appSidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('open');
   }
 
   // ---------- study mode ----------
@@ -1232,7 +1304,7 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   function updateExamTimerDisplay(){
     const m = Math.max(0, Math.floor(examSecondsLeft/60));
     const s = Math.max(0, examSecondsLeft%60);
-    const el = document.getElementById('examTimer');
+    const el = document.getElementById('sidebarTimer');
     el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     el.classList.toggle('low', examSecondsLeft<=300);
   }
@@ -1312,6 +1384,21 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   updateHint();
   refreshCounts();
   renderProgressPanel();
+  updateSidebarStats();
+
+  document.getElementById('hamburgerBtn').addEventListener('click', ()=>{
+    document.getElementById('appSidebar').classList.toggle('open');
+    document.getElementById('sidebarBackdrop').classList.toggle('open');
+  });
+  document.getElementById('sidebarBackdrop').addEventListener('click', closeSidebarDrawer);
+  document.getElementById('sidebarHomeBtn').addEventListener('click', ()=>{
+    const inExam = !document.getElementById('screen-exam').classList.contains('hidden');
+    if(inExam){
+      if(!confirm('Bạn đang làm bài thi thật. Thoát ra sẽ huỷ bài đang làm (không tính điểm). Tiếp tục thoát?')) return;
+      clearInterval(examTimerInterval);
+    }
+    show('screen-home');
+  });
 
   buildStudyFileGrid();
   buildStudyCatGrid();
@@ -1333,7 +1420,7 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   document.getElementById('btnGoExamIntro').addEventListener('click', showExamIntro);
   document.getElementById('btnBackFromExamIntro').addEventListener('click', ()=> show('screen-home'));
   document.getElementById('btnStartRealExam').addEventListener('click', startRealExam);
-  document.getElementById('btnSubmitExam').addEventListener('click', ()=> submitExam(false));
+  document.getElementById('btnSubmitExamSidebar').addEventListener('click', ()=> submitExam(false));
   document.getElementById('btnExamPrev').addEventListener('click', ()=>{
     if(examCurrentIdx>0){ examCurrentIdx--; renderExamQuestion(); renderExamNav(); }
   });
