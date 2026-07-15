@@ -243,6 +243,51 @@
   }
   .no-results{color:var(--ink-soft);font-size:13.5px;padding:30px 0;text-align:center;}
   mark{background:var(--gold-soft);color:var(--navy);padding:0 2px;border-radius:2px;}
+
+  /* ---------- OFFICIAL EXAM MODE ---------- */
+  .exam-cta-panel{
+    background:linear-gradient(135deg, #16324A, var(--navy));
+    border-top:1px solid var(--line);
+  }
+  .exam-cta-inner{
+    padding:26px 40px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+  }
+  .exam-cta-title{font-family:'Source Serif 4',serif;color:var(--paper);font-size:19px;margin:2px 0 8px;}
+  .exam-cta-sub{color:rgba(250,246,236,0.75);font-size:13px;line-height:1.6;max-width:520px;margin:0;}
+
+  .exam-stats-box{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;margin-top:16px;
+  }
+  .exam-stat-item{font-size:13px;}
+  .exam-stat-item b{color:var(--navy);font-family:'Source Serif 4',serif;}
+  .exam-mode-notice{
+    background:#FCF3D9;border-left:3px solid var(--gold);color:var(--navy);
+    padding:14px 18px;border-radius:var(--radius);font-size:13.5px;line-height:1.6;
+  }
+
+  .exam-top-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:16px 40px;border-bottom:1px solid var(--line);
+  }
+  .exam-timer{
+    font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--seal);
+    background:#1A1A1A;color:#ff5b4d;padding:6px 16px;border-radius:4px;letter-spacing:1px;
+  }
+  .exam-timer.low{animation:examPulse 1s infinite;}
+  @keyframes examPulse{ 50%{ opacity:0.45; } }
+
+  .exam-nav-wrap{padding:18px 40px;border-bottom:1px solid var(--line);max-height:220px;overflow-y:auto;}
+  .exam-nav-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+  .exam-nav-label{font-size:12px;color:var(--ink-soft);width:210px;flex-shrink:0;padding-top:5px;}
+  .exam-nav-circles{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
+  .exam-nav-circle{
+    width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--navy);
+    font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;flex-shrink:0;
+  }
+  .exam-nav-circle.answered{background:var(--navy);border-color:var(--navy);color:var(--paper);}
+  .exam-nav-circle.current{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:700;}
+
   .hist-row{display:flex;align-items:center;gap:14px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;}
   .hist-row:last-child{border-bottom:none;}
   .hist-date{font-family:'JetBrains Mono',monospace;color:var(--ink-soft);width:130px;flex-shrink:0;}
@@ -289,6 +334,17 @@
       <h1>Ôn tập trước kỳ kiểm tra năng lực chuyên môn</h1>
       <p class="sub">Toàn bộ câu hỏi được tổng hợp và loại trùng từ 5 bộ đề: đề luyện tập chuyên nghiệp, đề họp thống nhất URD, đề SKĐT, ngân hàng câu hỏi PL03 (2026), và bộ 30 câu Cloud BIDV (QĐ 4269). Chọn nguồn đề, chuyên đề, số lượng câu, rồi bắt đầu làm bài như thi thật.</p>
       <div class="stamp-row" id="statStamps"></div>
+    </div>
+
+    <div class="panel exam-cta-panel">
+      <div class="exam-cta-inner">
+        <div>
+          <p class="section-label" style="color:var(--gold);">Chế độ chính thức</p>
+          <h2 class="exam-cta-title">🎓 Thi thật — Kiểm tra năng lực chuyên môn</h2>
+          <p class="exam-cta-sub">50 câu ngẫu nhiên trong 45 phút, rút từ ngân hàng câu hỏi chính thức (không tính bộ luyện tập), không xem đáp án trong quá trình làm bài — mô phỏng đúng định dạng bài thi thật.</p>
+        </div>
+        <button class="btn btn-primary" id="btnGoExamIntro" style="flex-shrink:0;">Vào phòng thi →</button>
+      </div>
     </div>
 
     <div class="panel" id="progressPanel" style="display:none;">
@@ -357,6 +413,46 @@
       <div class="pager" id="pagerTop"></div>
       <div id="studyList"></div>
       <div class="pager" id="pagerBottom" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===================== EXAM INTRO SCREEN ===================== -->
+  <div id="screen-exam-intro" class="card hidden">
+    <div class="hero">
+      <p class="section-label">ĐỢT THI: KIỂM TRA NLCM CÁN BỘ 2025</p>
+      <h1 style="color:var(--seal);">KIỂM TRA NĂNG LỰC CHUYÊN MÔN</h1>
+      <p class="sub" id="examIntroDesc"></p>
+      <div class="exam-stats-box" id="examStatsBox"></div>
+    </div>
+    <div class="panel">
+      <div class="exam-mode-notice">
+        📋 <b>Chế độ Thi thật:</b> 50 câu ngẫu nhiên từ ngân hàng câu hỏi chính thức (không gồm bộ luyện tập), thời gian <b>45 phút</b>, không xem đáp án trong quá trình làm bài. Kết quả và đáp án chỉ hiện ra sau khi nộp bài.
+      </div>
+      <div class="cta-row" style="margin-top:20px;">
+        <button class="btn btn-primary" id="btnStartRealExam">Bắt đầu làm bài</button>
+        <button class="btn btn-ghost" id="btnBackFromExamIntro">← Về trang chủ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== EXAM (REAL TEST) SCREEN ===================== -->
+  <div id="screen-exam" class="card hidden">
+    <div class="exam-top-bar">
+      <span class="counter">ĐỢT THI: KIỂM TRA NLCM CÁN BỘ 2025</span>
+      <div class="exam-timer" id="examTimer">45:00</div>
+      <button class="btn btn-primary" id="btnSubmitExam" style="padding:9px 18px;font-size:13px;">✈ Nộp bài</button>
+    </div>
+    <div class="exam-nav-wrap" id="examNavWrap"></div>
+    <div class="q-panel">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <p class="q-text" id="examQText" style="margin-bottom:6px;">Câu hỏi...</p>
+      </div>
+      <span class="q-tag" id="examQCatTag" style="margin-bottom:16px;display:inline-block;">Chuyên đề</span>
+      <div id="examOptsWrap"></div>
+    </div>
+    <div class="quiz-actions">
+      <button class="btn btn-ghost" id="btnExamPrev">← Câu trước</button>
+      <button class="btn btn-primary" id="btnExamNext">Câu sau →</button>
     </div>
   </div>
 
@@ -702,7 +798,7 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   }
 
   function show(id){
-    ['screen-home','screen-quiz','screen-result','screen-study'].forEach(s=>{
+    ['screen-home','screen-quiz','screen-result','screen-study','screen-exam-intro','screen-exam'].forEach(s=>{
       document.getElementById(s).classList.toggle('hidden', s!==id);
     });
     if(id==='screen-home') renderProgressPanel();
@@ -1002,6 +1098,10 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
   function finishQuiz(){
     recordSessionResult();
     document.getElementById('progressBar').style.width = '100%';
+    showResultScreen();
+  }
+
+  function showResultScreen(){
     const pct = Math.round((score/pool.length)*100);
     show('screen-result');
     const pass = pct >= 80;
@@ -1018,7 +1118,6 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
       byCat[q.category] = byCat[q.category] || {correct:0,total:0};
       byCat[q.category].total++;
     });
-    wrongLog.forEach(w=>{}); // wrongLog only has wrong; compute correct = total - wrongInCat
     const wrongByCat = {};
     wrongLog.forEach(w=>{ wrongByCat[w.category] = (wrongByCat[w.category]||0)+1; });
     Object.keys(byCat).forEach(cat=>{
@@ -1053,10 +1152,13 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
         const refLine = w.ref
           ? `<div class="ref-tag" style="margin-top:8px;">Tra cứu: ${escapeHtml(w.ref)}${w.clause? ' — '+escapeHtml(w.clause):''}</div>`
           : `<div class="ref-tag" style="margin-top:8px;">Tra cứu: chuyên đề "${escapeHtml(w.category)}" — nguồn ${escapeHtml(fileLabel)}</div>`;
+        const yourLine = w.chosen
+          ? `Bạn chọn: ${w.chosen}. ${escapeHtml(w.options[w.chosen]||'')}`
+          : `Bạn chọn: <i>(không chọn đáp án)</i>`;
         item.innerHTML = `
           <span class="study-tag">${escapeHtml(w.category)}</span>
           <div class="review-q">${escapeHtml(w.question)}</div>
-          <div class="review-line your">Bạn chọn: ${w.chosen}. ${escapeHtml(w.options[w.chosen]||'')}</div>
+          <div class="review-line your">${yourLine}</div>
           <div class="review-line correct-line">Đáp án đúng: ${w.answer}. ${escapeHtml(w.options[w.answer])}</div>
           ${refLine}
         `;
@@ -1071,6 +1173,134 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     const d = document.createElement('div');
     d.textContent = s;
     return d.innerHTML;
+  }
+
+  // ---------- official "Thi thật" exam mode ----------
+  const EXAM_QUESTION_COUNT = 50;
+  const EXAM_DURATION_SEC = 45*60;
+  let examPool = [];
+  let examAnswers = {}; // idx -> letter
+  let examCurrentIdx = 0;
+  let examSecondsLeft = EXAM_DURATION_SEC;
+  let examTimerInterval = null;
+
+  function computeExamEligiblePool(){
+    // Official exam pool excludes the practice-only question set.
+    return QUESTION_BANK.filter(q=>q.fileGroups.some(fg=>fg!=='luyen_tap'));
+  }
+
+  function showExamIntro(){
+    const eligible = computeExamEligiblePool();
+    const nCats = new Set(eligible.map(q=>q.category)).size;
+    document.getElementById('examIntroDesc').textContent =
+      `Bộ câu hỏi chính thức NLCM 2025 — ${eligible.length} câu hỏi từ ngân hàng chính thức (không gồm bộ luyện tập chuyên nghiệp).`;
+    document.getElementById('examStatsBox').innerHTML = `
+      <div class="exam-stat-item"><b>Ngân hàng:</b> ${eligible.length} câu</div>
+      <div class="exam-stat-item"><b>Chuyên đề:</b> ${nCats} nhóm</div>
+      <div class="exam-stat-item"><b>Đề thi thật:</b> ${EXAM_QUESTION_COUNT} câu / 45 phút</div>
+      <div class="exam-stat-item"><b>Kết quả:</b> Hiện sau khi nộp bài</div>
+    `;
+    show('screen-exam-intro');
+  }
+
+  function startRealExam(){
+    const eligible = computeExamEligiblePool();
+    examPool = smartShuffle(eligible).slice(0, Math.min(EXAM_QUESTION_COUNT, eligible.length));
+    markShown(examPool.map(q=>q.id));
+    examAnswers = {};
+    examCurrentIdx = 0;
+    examSecondsLeft = EXAM_DURATION_SEC;
+    renderExamNav();
+    renderExamQuestion();
+    startExamTimer();
+    show('screen-exam');
+  }
+
+  function startExamTimer(){
+    clearInterval(examTimerInterval);
+    updateExamTimerDisplay();
+    examTimerInterval = setInterval(()=>{
+      examSecondsLeft--;
+      updateExamTimerDisplay();
+      if(examSecondsLeft<=0){
+        clearInterval(examTimerInterval);
+        submitExam(true);
+      }
+    }, 1000);
+  }
+
+  function updateExamTimerDisplay(){
+    const m = Math.max(0, Math.floor(examSecondsLeft/60));
+    const s = Math.max(0, examSecondsLeft%60);
+    const el = document.getElementById('examTimer');
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('low', examSecondsLeft<=300);
+  }
+
+  function renderExamNav(){
+    const wrap = document.getElementById('examNavWrap');
+    let html = '';
+    CATS.forEach(cat=>{
+      const items = examPool.map((q,i)=>({q,i})).filter(o=>o.q.category===cat);
+      if(items.length===0) return;
+      const circles = items.map(o=>{
+        const cls = ['exam-nav-circle'];
+        if(o.i===examCurrentIdx) cls.push('current');
+        else if(examAnswers[o.i]) cls.push('answered');
+        return `<button class="${cls.join(' ')}" data-idx="${o.i}">${o.i+1}</button>`;
+      }).join('');
+      html += `<div class="exam-nav-row"><span class="exam-nav-label">${escapeHtml(cat)}</span><div class="exam-nav-circles">${circles}</div></div>`;
+    });
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-idx]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        examCurrentIdx = Number(btn.dataset.idx);
+        renderExamQuestion();
+        renderExamNav();
+      });
+    });
+  }
+
+  function renderExamQuestion(){
+    const q = examPool[examCurrentIdx];
+    document.getElementById('examQText').textContent = `Câu ${examCurrentIdx+1}. ${q.question}`;
+    document.getElementById('examQCatTag').textContent = q.category;
+    const wrap = document.getElementById('examOptsWrap');
+    wrap.innerHTML = '';
+    Object.entries(q.options).forEach(([letter,text])=>{
+      const div = document.createElement('div');
+      div.className = 'opt' + (examAnswers[examCurrentIdx]===letter ? ' selected' : '');
+      div.dataset.letter = letter;
+      div.innerHTML = `<div class="letter">${letter}</div><div class="txt">${escapeHtml(text)}</div>`;
+      div.addEventListener('click', ()=>{
+        examAnswers[examCurrentIdx] = letter;
+        renderExamQuestion();
+        renderExamNav();
+      });
+      wrap.appendChild(div);
+    });
+    document.getElementById('btnExamPrev').disabled = (examCurrentIdx===0);
+    document.getElementById('btnExamNext').textContent = (examCurrentIdx===examPool.length-1) ? 'Câu cuối' : 'Câu sau →';
+  }
+
+  function submitExam(autoSubmitted){
+    clearInterval(examTimerInterval);
+    const unanswered = examPool.length - Object.keys(examAnswers).length;
+    if(!autoSubmitted){
+      const msg = unanswered>0
+        ? `Bạn còn ${unanswered} câu chưa trả lời. Vẫn nộp bài?`
+        : 'Nộp bài thi ngay bây giờ?';
+      if(!confirm(msg)) return;
+    }
+    pool = examPool;
+    score = 0; wrongLog = [];
+    examPool.forEach((q,i)=>{
+      const sel = examAnswers[i];
+      if(sel && sel===q.answer) score++;
+      else wrongLog.push({...q, chosen: sel || ''});
+    });
+    recordSessionResult();
+    showResultScreen();
   }
 
   // ---------- wire up ----------
@@ -1098,6 +1328,17 @@ const QUESTION_BANK = [{"source":"Bo_cau_hoi_luyen_tap_chuyen_nghiep.xlsx","shee
     persistentWrongIds = new Set();
     history = [];
     renderProgressPanel();
+  });
+
+  document.getElementById('btnGoExamIntro').addEventListener('click', showExamIntro);
+  document.getElementById('btnBackFromExamIntro').addEventListener('click', ()=> show('screen-home'));
+  document.getElementById('btnStartRealExam').addEventListener('click', startRealExam);
+  document.getElementById('btnSubmitExam').addEventListener('click', ()=> submitExam(false));
+  document.getElementById('btnExamPrev').addEventListener('click', ()=>{
+    if(examCurrentIdx>0){ examCurrentIdx--; renderExamQuestion(); renderExamNav(); }
+  });
+  document.getElementById('btnExamNext').addEventListener('click', ()=>{
+    if(examCurrentIdx<examPool.length-1){ examCurrentIdx++; renderExamQuestion(); renderExamNav(); }
   });
 
   document.getElementById('btnStudy').addEventListener('click', ()=>{
